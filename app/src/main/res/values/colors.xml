@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3d4bcc</color>
+    <color name="colorPrimaryDark">#242b70</color>
+    <color name="colorAccent">#D81B60</color>
+
+    <color name="transparent">#00000000</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+
+    <color name="marker_strong">#5e96e2</color> <!-- #5e96e2 -->
+    <color name="marker_medium">#d6b2d6</color> <!-- #d6b2d6 -->
+    <color name="marker_weak">#ff6060</color> <!-- #ff6060 -->
+
+    <color name="text_hint_color">#2D75CA</color>
+
+    <color name="appBackColor">#ffffff</color>
+    <color name="tab_start_color">#2D75CA</color>
+    <color name="tab_end_color">#3063BA</color>
+    <color name="tab_not_selected">#EDEDED</color>
+    <color name="tab_not_selected_text">#787878</color>
+
+    <color name="gray_60">#999b9b9b</color>
+    <color name="translucent_black">#55000000</color>
+    <color name="blue">#2d75ca</color>
+    <color name="light_blue">#d2e1f2</color>
+    <color name="grey">#ededed</color>
+    <color name="green">#1c9626</color>
+
+    <color name="yellow">#FFFF00</color>
+    <color name="fuchsia">#FF00FF</color>
+    <color name="red">#FF0000</color>
+    <color name="silver">#C0C0C0</color>
+    <color name="gray">#808080</color>
+    <color name="olive">#808000</color>
+    <color name="purple">#800080</color>
+    <color name="maroon">#800000</color>
+    <color name="aqua">#00FFFF</color>
+    <color name="lime">#00FF00</color>
+    <color name="teal">#008080</color>
+    <color name="customeblue">#517ae8</color>
+    <color name="navy">#000080</color>
+</resources>
