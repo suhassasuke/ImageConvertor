@@ -2,6 +2,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/undo"
+        android:icon="@drawable/ic_undo"
+        app:showAsAction="ifRoom"
+        android:title="Gallery">
+    </item>
+    <item
+        android:id="@+id/redo"
+        android:icon="@drawable/ic_redo"
+        app:showAsAction="ifRoom"
+        android:title="Gallery">
+    </item>
+    <item
         android:id="@+id/gallery"
         android:icon="@drawable/ic_collections_gallery"
         app:showAsAction="ifRoom"

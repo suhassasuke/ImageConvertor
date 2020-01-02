@@ -12,12 +12,15 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
@@ -53,7 +56,7 @@ public class MainActivity extends BaseActivity {
 
     static final int REQUEST_IMAGE = 2;
     boolean initialLoad = true;
-    String imagePath="";
+    String imagePath = "";
     Bitmap imageBitmap = null;
     Uri pickedImage = null;
     String[] permission = new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE};
@@ -84,13 +87,35 @@ public class MainActivity extends BaseActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.gallery) {
-            initialLoad = false;
-            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
-            startActivityForResult(intent, REQUEST_IMAGE);
-            return true;
+        switch (item.getItemId()) {
+            case R.id.gallery:
+                initialLoad = false;
+                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+                startActivityForResult(intent, REQUEST_IMAGE);
+                return true;
+            case R.id.undo:
+                imageRotation(true);
+                return true;
+            case R.id.redo:
+                imageRotation(false);
+                return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void imageRotation(boolean status) {
+        try {
+            Matrix matrix = new Matrix();
+            if (status) {
+                matrix.postRotate(-90);
+            } else {
+                matrix.postRotate(90);
+            }
+            imageBitmap = Bitmap.createBitmap(imageBitmap, 0, 0, imageBitmap.getWidth(), imageBitmap.getHeight(), matrix, true); // rotating bitmap
+        } catch (Exception e) {
+
+        }
+        imageView.setImageBitmap(imageBitmap);
     }
 
     private void CheckPermission() {
@@ -101,8 +126,8 @@ public class MainActivity extends BaseActivity {
     }
 
     @OnClick(R.id.image)
-    public void OnClickImage(){
-        if(initialLoad){
+    public void OnClickImage() {
+        if (initialLoad) {
             initialLoad = false;
             Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
             startActivityForResult(intent, REQUEST_IMAGE);
@@ -119,21 +144,25 @@ public class MainActivity extends BaseActivity {
     public void onConvertClicked() {
         if (imageBitmap != null) {
             String type = spinner.getSelectedItem().toString();
-            if (type.equals("PDF")){
-                convertPDF(imagePath);
-            }else{
-                dialog.show();
+            dialog.show();
+            if (type.equals("PDF")) {
+                convertPDF(imageBitmap);
+            } else {
                 ImageConverter converter = new ImageConverter(this, type, imageBitmap);
                 converter.execute();
             }
         }
     }
 
-    public void convertPDF(String filePath) {
+    public void convertPDF(Bitmap imageBitmap) {
         try {
+            File filePath = new File(android.os.Environment.getExternalStorageDirectory(), generateUniqueImageFileName() + ".jpg");
+            FileOutputStream fileOutputStream = new FileOutputStream(filePath);
+            imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream); //100-best quality
+            fileOutputStream.close();
             Document document = new Document();
 
-            File file = new File(android.os.Environment.getExternalStorageDirectory(), generateUniqueImageFileName()+".pdf");
+            File file = new File(android.os.Environment.getExternalStorageDirectory(), generateUniqueImageFileName() + ".pdf");
             FileOutputStream out = new FileOutputStream(file);
             PdfWriter.getInstance(document, out); //  Change pdf's name.
 //            PdfWriter.getInstance(document, new FileOutputStream(directoryPath + "/example.pdf")); //  Change pdf's name.
@@ -141,7 +170,7 @@ public class MainActivity extends BaseActivity {
             document.open();
 
 //            Image image = Image.getInstance(directoryPath + "/" + "example.jpg");  // Change image's name and extension.
-            Image image = Image.getInstance(filePath);  // Change image's name and extension.
+            Image image = Image.getInstance(filePath.getAbsolutePath());  // Change image's name and extension.
 
             float scaler = ((document.getPageSize().getWidth() - document.leftMargin()
                     - document.rightMargin() - 0) / image.getWidth()) * 100; // 0 means you have no indentation. If you have any, change it.
@@ -151,23 +180,12 @@ public class MainActivity extends BaseActivity {
             document.add(image);
             document.close();
 
-//            Intent intent = new Intent();
-//            intent.setAction(Intent.ACTION_VIEW);
-//            intent.setDataAndType(Uri.parse(file.getAbsolutePath()), "application/pdf");
-//            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//            startActivity(intent);
-
-
-//            Intent intent =new Intent();
-//            intent.setType("application/pdf");
-//            intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
-//
-//            startActivity(Intent.createChooser(intent, "Open File"));
-
+            filePath.delete();
+            dialog.cancel();
             Intent intent = new Intent(this, PDFViewer.class);
             intent.putExtra("filePath", file);
             startActivity(intent);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
