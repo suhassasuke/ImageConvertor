@@ -26,7 +26,9 @@ import android.view.MenuItem;
 import android.webkit.WebView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.itextpdf.text.Document;
@@ -60,7 +62,7 @@ public class MainActivity extends BaseActivity {
     Bitmap imageBitmap = null;
     Uri pickedImage = null;
     String[] permission = new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE};
-
+    int progressValue = 100;
     TransparentProgressDialog dialog;
 
     @BindView(R.id.spinner1)
@@ -68,6 +70,12 @@ public class MainActivity extends BaseActivity {
 
     @BindView(R.id.image)
     ImageView imageView;
+
+    @BindView(R.id.image_quality)
+    SeekBar imageQuality;
+
+    @BindView(R.id.quality_percentage)
+    TextView qualityPercentage;
 
     @Override
     protected int getContentResource() {
@@ -89,7 +97,6 @@ public class MainActivity extends BaseActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.gallery:
-                initialLoad = false;
                 Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
                 startActivityForResult(intent, REQUEST_IMAGE);
                 return true;
@@ -128,7 +135,6 @@ public class MainActivity extends BaseActivity {
     @OnClick(R.id.image)
     public void OnClickImage() {
         if (initialLoad) {
-            initialLoad = false;
             Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
             startActivityForResult(intent, REQUEST_IMAGE);
         }
@@ -148,7 +154,7 @@ public class MainActivity extends BaseActivity {
             if (type.equals("PDF")) {
                 convertPDF(imageBitmap);
             } else {
-                ImageConverter converter = new ImageConverter(this, type, imageBitmap);
+                ImageConverter converter = new ImageConverter(this, type, progressValue, imageBitmap);
                 converter.execute();
             }
         }
@@ -158,7 +164,7 @@ public class MainActivity extends BaseActivity {
         try {
             File filePath = new File(android.os.Environment.getExternalStorageDirectory(), generateUniqueImageFileName() + ".jpg");
             FileOutputStream fileOutputStream = new FileOutputStream(filePath);
-            imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream); //100-best quality
+            imageBitmap.compress(Bitmap.CompressFormat.JPEG, progressValue, fileOutputStream); //100-best quality
             fileOutputStream.close();
             Document document = new Document();
 
@@ -207,6 +213,28 @@ public class MainActivity extends BaseActivity {
         dialog = new TransparentProgressDialog(this);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, imageType);
         spinner.setAdapter(adapter);
+        imageQuality.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                progressValue = progress;
+                qualityPercentage.setText(progress+"%");
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                Log.d("onStartTrackingTouch","start");
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                Log.d("onStopTrackingTouch","stop");
+                if(progressValue<30){
+                    progressValue = 30;
+                    imageQuality.setProgress(progressValue);
+                    Toast.makeText(getApplicationContext(),"Minimum quality: 30%", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     @Override
@@ -215,6 +243,7 @@ public class MainActivity extends BaseActivity {
         if (requestCode == REQUEST_IMAGE && resultCode == RESULT_OK) {
             pickedImage = data.getData();
             if (pickedImage != null) {
+                initialLoad = false;
                 imagePath = FileUtils.getPath(getApplicationContext(), pickedImage);
                 BitmapFactory.Options bmOptions = new BitmapFactory.Options();
                 imageBitmap = BitmapFactory.decodeFile(imagePath, bmOptions);

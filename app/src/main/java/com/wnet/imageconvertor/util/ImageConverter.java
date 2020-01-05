@@ -15,10 +15,12 @@ public class ImageConverter extends AsyncTask<Void, Void, String> {
     private MainActivity activity;
     private String type;
     private Bitmap imageBitmap;
+    private int quality;
 
-    public ImageConverter(MainActivity activity, String type, Bitmap imageBitmap) {
+    public ImageConverter(MainActivity activity, String type, int quality, Bitmap imageBitmap) {
         this.activity = activity;
         this.type = type;
+        this.quality = quality;
         this.imageBitmap = imageBitmap;
     }
 
@@ -37,11 +39,11 @@ public class ImageConverter extends AsyncTask<Void, Void, String> {
             }
             FileOutputStream out = new FileOutputStream(new File(android.os.Environment.getExternalStorageDirectory(), filename));
             if(type.equals("JPEG")){
-                imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out); //100-best quality
+                imageBitmap.compress(Bitmap.CompressFormat.JPEG, quality, out); //100-best quality
             }else if(type.equals("PNG")){
-                imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, out); //100-best quality
+                imageBitmap.compress(Bitmap.CompressFormat.PNG, quality, out); //100-best quality
             }else if(type.equals("WEBP")){
-                imageBitmap.compress(Bitmap.CompressFormat.WEBP, 100, out); //100-best quality
+                imageBitmap.compress(Bitmap.CompressFormat.WEBP, quality, out); //100-best quality
             }
             out.close();
             return filename;
