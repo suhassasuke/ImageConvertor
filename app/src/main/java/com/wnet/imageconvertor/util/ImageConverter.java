@@ -26,7 +26,6 @@ public class ImageConverter extends AsyncTask<Void, Void, String> {
 
     @Override
     protected String doInBackground(Void... params) {
-
         try {
             String filename = generateUniqueImageFileName();
 //            FileOutputStream out = new FileOutputStream(filename);

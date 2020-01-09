@@ -2,11 +2,14 @@ package com.wnet.imageconvertor.Screens;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 
 import android.Manifest;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -16,6 +19,7 @@ import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -34,6 +38,7 @@ import android.widget.Toast;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.wnet.imageconvertor.BuildConfig;
 import com.wnet.imageconvertor.R;
 import com.wnet.imageconvertor.base.BaseActivity;
 import com.wnet.imageconvertor.dialog.TransparentProgressDialog;
@@ -126,9 +131,11 @@ public class MainActivity extends BaseActivity {
     }
 
     private void CheckPermission() {
-        if (ContextCompat.checkSelfPermission(getApplicationContext(), permission[0]) != PackageManager.PERMISSION_GRANTED
-                || ContextCompat.checkSelfPermission(getApplicationContext(), permission[1]) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(permission, 1);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ContextCompat.checkSelfPermission(getApplicationContext(), permission[0]) != PackageManager.PERMISSION_GRANTED
+                    || ContextCompat.checkSelfPermission(getApplicationContext(), permission[1]) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(permission, 1);
+            }
         }
     }
 
@@ -197,15 +204,24 @@ public class MainActivity extends BaseActivity {
     }
 
     public void convertedImage(String fileName) {
-        dialog.cancel();
-        if (fileName != null) {
-            File filePath = new File(android.os.Environment.getExternalStorageDirectory(), fileName);
-            Intent intent = new Intent();
-            intent.setAction(Intent.ACTION_VIEW);
-            intent.setDataAndType(Uri.parse(filePath.getAbsolutePath()), "image/*");
-            startActivity(intent);
-        } else {
-            Toast.makeText(getApplicationContext(), "Error Getting Image!!", Toast.LENGTH_LONG).show();
+        try {
+            dialog.cancel();
+
+            if (fileName != null) {
+                File filePath = new File(android.os.Environment.getExternalStorageDirectory(), fileName);
+                Uri path = FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".provider", filePath);
+                Intent intent = new Intent();
+                intent.setAction(Intent.ACTION_VIEW);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                intent.setDataAndType(path, "image/*");
+                startActivity(intent);
+            } else {
+                Toast.makeText(getApplicationContext(), "Error Getting Image!!", Toast.LENGTH_LONG).show();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -217,21 +233,21 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 progressValue = progress;
-                qualityPercentage.setText(progress+"%");
+                qualityPercentage.setText(progress + "%");
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-                Log.d("onStartTrackingTouch","start");
+                Log.d("onStartTrackingTouch", "start");
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                Log.d("onStopTrackingTouch","stop");
-                if(progressValue<30){
+                Log.d("onStopTrackingTouch", "stop");
+                if (progressValue < 30) {
                     progressValue = 30;
                     imageQuality.setProgress(progressValue);
-                    Toast.makeText(getApplicationContext(),"Minimum quality: 30%", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Minimum quality: 30%", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -251,4 +267,27 @@ public class MainActivity extends BaseActivity {
             }
         }
     }
+
+//    public void ImageCropFunction(String filePath) {
+//
+//        // Image Crop Code
+//        try {
+//            Intent CropIntent = new Intent("com.android.camera.action.CROP");
+//
+//            CropIntent.setDataAndType(filePath, "image/*");
+//
+//            CropIntent.putExtra("crop", "true");
+//            CropIntent.putExtra("outputX", 180);
+//            CropIntent.putExtra("outputY", 180);
+//            CropIntent.putExtra("aspectX", 3);
+//            CropIntent.putExtra("aspectY", 4);
+//            CropIntent.putExtra("scaleUpIfNeeded", true);
+//            CropIntent.putExtra("return-data", true);
+//
+//            startActivityForResult(CropIntent, 1);
+//
+//        } catch (ActivityNotFoundException e) {
+//
+//        }
+//    }
 }
