@@ -1,4 +1,4 @@
-package com.wnet.imageconvertor.Screens;
+package com.wnet.imageconvertor.screens;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;

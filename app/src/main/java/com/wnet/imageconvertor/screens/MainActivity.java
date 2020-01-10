@@ -1,10 +1,7 @@
-package com.wnet.imageconvertor.Screens;
+package com.wnet.imageconvertor.screens;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
@@ -12,22 +9,17 @@ import android.Manifest;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
-import android.media.ExifInterface;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.webkit.WebView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -47,12 +39,8 @@ import com.wnet.imageconvertor.util.ImageConverter;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.Date;
-import java.util.Objects;
-import java.util.concurrent.ExecutionException;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 import static com.wnet.imageconvertor.util.Utils.generateUniqueImageFileName;
@@ -268,26 +256,26 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-//    public void ImageCropFunction(String filePath) {
-//
-//        // Image Crop Code
-//        try {
-//            Intent CropIntent = new Intent("com.android.camera.action.CROP");
-//
-//            CropIntent.setDataAndType(filePath, "image/*");
-//
-//            CropIntent.putExtra("crop", "true");
-//            CropIntent.putExtra("outputX", 180);
-//            CropIntent.putExtra("outputY", 180);
-//            CropIntent.putExtra("aspectX", 3);
-//            CropIntent.putExtra("aspectY", 4);
-//            CropIntent.putExtra("scaleUpIfNeeded", true);
-//            CropIntent.putExtra("return-data", true);
-//
-//            startActivityForResult(CropIntent, 1);
-//
-//        } catch (ActivityNotFoundException e) {
-//
-//        }
-//    }
+    public void ImageCropFunction(String filePath) {
+
+        // Image Crop Code
+        try {
+            Intent CropIntent = new Intent("com.android.camera.action.CROP");
+
+            CropIntent.setDataAndType(Uri.parse(filePath), "image/*");
+
+            CropIntent.putExtra("crop", "true");
+            CropIntent.putExtra("outputX", 180);
+            CropIntent.putExtra("outputY", 180);
+            CropIntent.putExtra("aspectX", 3);
+            CropIntent.putExtra("aspectY", 4);
+            CropIntent.putExtra("scaleUpIfNeeded", true);
+            CropIntent.putExtra("return-data", true);
+
+            startActivityForResult(CropIntent, 1);
+
+        } catch (ActivityNotFoundException e) {
+
+        }
+    }
 }

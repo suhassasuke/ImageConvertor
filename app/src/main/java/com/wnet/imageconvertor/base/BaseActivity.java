@@ -44,7 +44,7 @@ import butterknife.ButterKnife;
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
-public abstract class BaseActivity extends AppCompatActivity implements PermissionUtils.PermissionResultCallback {
+public abstract class BaseActivity extends Activity implements PermissionUtils.PermissionResultCallback {
     PermissionUtils permissionUtils = PermissionUtils.getInstance();
     private TransparentProgressDialog dialog;
     private boolean shouldICheckForPermissions;

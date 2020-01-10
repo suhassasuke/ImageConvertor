@@ -3,7 +3,7 @@ package com.wnet.imageconvertor.util;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 
-import com.wnet.imageconvertor.Screens.MainActivity;
+import com.wnet.imageconvertor.screens.MainActivity;
 
 import java.io.File;
 import java.io.FileOutputStream;
