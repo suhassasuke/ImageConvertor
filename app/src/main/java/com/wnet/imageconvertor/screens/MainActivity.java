@@ -1,12 +1,10 @@
 package com.wnet.imageconvertor.screens;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
 import android.Manifest;
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -19,9 +17,11 @@ import android.os.Handler;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -30,6 +30,8 @@ import android.widget.Toast;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 import com.wnet.imageconvertor.BuildConfig;
 import com.wnet.imageconvertor.R;
 import com.wnet.imageconvertor.base.BaseActivity;
@@ -56,7 +58,23 @@ public class MainActivity extends BaseActivity {
     Uri pickedImage = null;
     String[] permission = new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE};
     int progressValue = 100;
+    int rotateAngle = 0;
     TransparentProgressDialog dialog;
+
+    @BindView(R.id.edit_title_layout_first)
+    LinearLayout editTitleLayoutFirst;
+
+    @BindView(R.id.edit_title_layout_second)
+    LinearLayout editTitleLayoutSecond;
+
+    @BindView(R.id.main_layout)
+    LinearLayout mainLayout;
+
+    @BindView(R.id.crop_layout)
+    LinearLayout cropLayout;
+
+    @BindView(R.id.edit_layout_second)
+    LinearLayout editLayoutSecond;
 
     @BindView(R.id.spinner1)
     Spinner spinner;
@@ -69,6 +87,12 @@ public class MainActivity extends BaseActivity {
 
     @BindView(R.id.quality_percentage)
     TextView qualityPercentage;
+
+    @BindView(R.id.reset_image)
+    Button resetImage;
+
+    @BindView(R.id.cropImageView)
+    CropImageView cropImageView;
 
     @Override
     protected int getContentResource() {
@@ -86,21 +110,59 @@ public class MainActivity extends BaseActivity {
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.gallery:
-                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
-                startActivityForResult(intent, REQUEST_IMAGE);
-                return true;
-            case R.id.undo:
-                imageRotation(true);
-                return true;
-            case R.id.redo:
-                imageRotation(false);
-                return true;
+    @OnClick(R.id.undo)
+    public void onUndoClicked() {
+        imageRotation(true);
+    }
+
+    @OnClick(R.id.redo)
+    public void onRedoClicked() {
+        imageRotation(false);
+    }
+
+    @OnClick(R.id.gallery)
+    public void onGalleryClicked() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+        startActivityForResult(intent, REQUEST_IMAGE);
+    }
+
+    @OnClick(R.id.crop)
+    public void onCropClicked() {
+        mainLayout.setVisibility(View.GONE);
+        cropLayout.setVisibility(View.VISIBLE);
+        editTitleLayoutFirst.setVisibility(View.GONE);
+        editTitleLayoutSecond.setVisibility(View.VISIBLE);
+        cropImageView.setImageBitmap(imageBitmap);
+    }
+
+    @OnClick(R.id.crop_done)
+    public void onCropDoneClicked() {
+        resetImage.setVisibility(View.VISIBLE);
+        imageBitmap = cropImageView.getCroppedImage();
+        imageView.setImageBitmap(imageBitmap);
+        mainLayout.setVisibility(View.VISIBLE);
+        cropLayout.setVisibility(View.GONE);
+        editTitleLayoutFirst.setVisibility(View.VISIBLE);
+        editTitleLayoutSecond.setVisibility(View.GONE);
+    }
+
+    @OnClick(R.id.crop_rotate)
+    public void onCropRotateClicked() {
+        if (rotateAngle > 360) {
+            rotateAngle = 90;
         }
-        return super.onOptionsItemSelected(item);
+        rotateAngle += 90;
+        cropImageView.setRotatedDegrees(-rotateAngle);
+    }
+
+    @OnClick(R.id.flip_horizental)
+    public void onFlipHorizentalClicked() {
+        cropImageView.flipImageHorizontally();
+    }
+
+    @OnClick(R.id.flip_vertical)
+    public void onFlipVerticalClicked() {
+        cropImageView.flipImageVertically();
     }
 
     private void imageRotation(boolean status) {
@@ -113,7 +175,7 @@ public class MainActivity extends BaseActivity {
             }
             imageBitmap = Bitmap.createBitmap(imageBitmap, 0, 0, imageBitmap.getWidth(), imageBitmap.getHeight(), matrix, true); // rotating bitmap
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
         imageView.setImageBitmap(imageBitmap);
     }
@@ -139,6 +201,14 @@ public class MainActivity extends BaseActivity {
     protected void onResume() {
         super.onResume();
         CheckPermission();
+    }
+
+    @OnClick(R.id.reset_image)
+    public void onResetImageClicked() {
+        resetImage.setVisibility(View.GONE);
+        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+        imageBitmap = BitmapFactory.decodeFile(imagePath, bmOptions);
+        imageView.setImageBitmap(imageBitmap);
     }
 
     @OnClick(R.id.save_to_gallery)
@@ -182,7 +252,7 @@ public class MainActivity extends BaseActivity {
             document.close();
 
             filePath.delete();
-            dialog.cancel();
+            dialog.dismiss();
             Intent intent = new Intent(this, PDFViewer.class);
             intent.putExtra("filePath", file);
             startActivity(intent);
@@ -193,8 +263,7 @@ public class MainActivity extends BaseActivity {
 
     public void convertedImage(String fileName) {
         try {
-            dialog.cancel();
-
+            dialog.dismiss();
             if (fileName != null) {
                 File filePath = new File(android.os.Environment.getExternalStorageDirectory(), fileName);
                 Uri path = FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".provider", filePath);
@@ -244,38 +313,43 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_IMAGE && resultCode == RESULT_OK) {
-            pickedImage = data.getData();
-            if (pickedImage != null) {
-                initialLoad = false;
-                imagePath = FileUtils.getPath(getApplicationContext(), pickedImage);
-                BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-                imageBitmap = BitmapFactory.decodeFile(imagePath, bmOptions);
-                imageView.setImageBitmap(imageBitmap);
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case REQUEST_IMAGE:
+                    pickedImage = data.getData();
+                    if (pickedImage != null) {
+                        initialLoad = false;
+                        editTitleLayoutFirst.setVisibility(View.VISIBLE);
+                        editLayoutSecond.setVisibility(View.VISIBLE);
+                        imagePath = FileUtils.getPath(getApplicationContext(), pickedImage);
+                        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+                        imageBitmap = BitmapFactory.decodeFile(imagePath, bmOptions);
+                        imageView.setImageBitmap(imageBitmap);
+                    }
+                    break;
+                case CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE:
+                    CropImage.ActivityResult result = CropImage.getActivityResult(data);
+                    if (resultCode == RESULT_OK) {
+                        Uri resultUri = result.getUri();
+                        imageView.setImageURI(resultUri);
+                    } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                        Exception error = result.getError();
+                        error.printStackTrace();
+                    }
+                    break;
             }
         }
     }
 
-    public void ImageCropFunction(String filePath) {
-
-        // Image Crop Code
-        try {
-            Intent CropIntent = new Intent("com.android.camera.action.CROP");
-
-            CropIntent.setDataAndType(Uri.parse(filePath), "image/*");
-
-            CropIntent.putExtra("crop", "true");
-            CropIntent.putExtra("outputX", 180);
-            CropIntent.putExtra("outputY", 180);
-            CropIntent.putExtra("aspectX", 3);
-            CropIntent.putExtra("aspectY", 4);
-            CropIntent.putExtra("scaleUpIfNeeded", true);
-            CropIntent.putExtra("return-data", true);
-
-            startActivityForResult(CropIntent, 1);
-
-        } catch (ActivityNotFoundException e) {
-
+    @Override
+    public void onBackPressed() {
+        if(editTitleLayoutFirst.getVisibility()==View.VISIBLE) {
+            super.onBackPressed();
+        }else{
+            mainLayout.setVisibility(View.VISIBLE);
+            cropLayout.setVisibility(View.GONE);
+            editTitleLayoutFirst.setVisibility(View.VISIBLE);
+            editTitleLayoutSecond.setVisibility(View.GONE);
         }
     }
 }

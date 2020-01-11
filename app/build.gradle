@@ -7,8 +7,8 @@ android {
         applicationId "com.wnet.imageconvertor"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 5
-        versionName "1.0.5"
+        versionCode 7
+        versionName "1.0.7"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -51,4 +51,7 @@ dependencies {
 
     //pdf viewer
     implementation 'com.github.barteksc:android-pdf-viewer:3.0.0-beta.5'
+
+    //image croping
+    api 'com.theartofdev.edmodo:android-image-cropper:2.8.0'
 }

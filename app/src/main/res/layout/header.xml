@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="?attr/actionBarSize"
+    android:background="@color/colorPrimary"
+    android:orientation="horizontal">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:src="@mipmap/ic_launcher"/>
+
+    <LinearLayout
+        android:id="@+id/edit_title_layout_first"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentEnd="true"
+        android:visibility="gone"
+        tools:visibility="gone">
+
+        <ImageView
+            android:id="@+id/crop"
+            android:layout_width="?attr/actionBarSize"
+            android:layout_height="?attr/actionBarSize"
+            android:scaleType="center"
+            android:src="@drawable/ic_crop_24dp" />
+
+        <ImageView
+            android:id="@+id/undo"
+            android:layout_width="?attr/actionBarSize"
+            android:layout_height="?attr/actionBarSize"
+            android:scaleType="center"
+            android:src="@drawable/ic_undo" />
+
+        <ImageView
+            android:id="@+id/redo"
+            android:layout_width="?attr/actionBarSize"
+            android:layout_height="?attr/actionBarSize"
+            android:scaleType="center"
+            android:src="@drawable/ic_redo" />
+
+        <ImageView
+            android:id="@+id/gallery"
+            android:layout_width="?attr/actionBarSize"
+            android:layout_height="?attr/actionBarSize"
+            android:scaleType="center"
+            android:src="@drawable/ic_collections_gallery"/>
+
+        <Button
+            android:id="@+id/reset_image"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="reset"
+            android:background="@drawable/crop_image_bg_view"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:visibility="gone"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/edit_title_layout_second"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentEnd="true"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <ImageView
+            android:id="@+id/flip_horizental"
+            android:layout_width="?attr/actionBarSize"
+            android:layout_height="?attr/actionBarSize"
+            android:scaleType="center"
+            android:src="@drawable/ic_flip_white" />
+
+        <ImageView
+            android:id="@+id/flip_vertical"
+            android:layout_width="?attr/actionBarSize"
+            android:layout_height="?attr/actionBarSize"
+            android:rotation="90"
+            android:scaleType="center"
+            android:src="@drawable/ic_flip_white" />
+
+        <ImageView
+            android:id="@+id/crop_rotate"
+            android:layout_width="?attr/actionBarSize"
+            android:layout_height="?attr/actionBarSize"
+            android:scaleType="center"
+            android:src="@drawable/ic_rotate_90_degrees" />
+
+        <Button
+            android:id="@+id/crop_done"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="Done"
+            android:background="@drawable/crop_image_bg_view"
+            android:textColor="@color/white"
+            android:textStyle="bold"/>
+    </LinearLayout>
+</RelativeLayout>

@@ -1,8 +1,10 @@
 package com.wnet.imageconvertor.screens;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,6 +14,7 @@ import com.github.barteksc.pdfviewer.PDFView;
 import com.github.barteksc.pdfviewer.util.FitPolicy;
 import com.wnet.imageconvertor.BuildConfig;
 import com.wnet.imageconvertor.R;
+import com.wnet.imageconvertor.base.BaseActivity;
 
 import java.io.File;
 import java.text.DecimalFormat;
@@ -20,7 +23,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class PDFViewer extends AppCompatActivity {
+public class PDFViewer extends BaseActivity {
 
     File file;
 
@@ -31,13 +34,14 @@ public class PDFViewer extends AppCompatActivity {
     TextView fileSize;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_pdfviewer);
-        ButterKnife.bind(this);
+    protected int getContentResource() {
+        return R.layout.activity_pdfviewer;
+    }
 
+    @Override
+    protected void init(@Nullable Bundle state) {
         file = (File) getIntent().getSerializableExtra("filePath");
-        filePath.setText("File Name: "+file.getName());
+        filePath.setText(file.getName());
         fileSize();
 
         PDFView pdfView = findViewById(R.id.pdfView);
@@ -92,7 +96,7 @@ public class PDFViewer extends AppCompatActivity {
     }
 
     public void fileSize(){
-        String hrSize = "File Size: ";
+        String hrSize = "";
         double fileSizeInKB   = file.length()/1024.0;
         DecimalFormat dec = new DecimalFormat("0.00");
 
