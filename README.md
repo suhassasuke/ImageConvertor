@@ -8,7 +8,7 @@ Image Convertor formats:
 3. WEBP
 4. PDF
 </br></br></br></br>
-<div class="row">
+<div class="row" style="background-color: lightblue;">
 <img src="screenshots/screen1.png" alt="Smiley face" height="400" width="200" hspace="30"/>
 <img src="screenshots/screen2.png" alt="Smiley face" height="400" width="200" hspace="30"/>
 <img src="screenshots/screen3.png" alt="Smiley face" height="400" width="200" hspace="30"/>
