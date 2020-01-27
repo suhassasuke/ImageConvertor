@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_navigation"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.wnet.imageconvertor.ui.homescreen.HomeFragment"
+        android:label="home_fragment"
+        tools:layout="@layout/home_fragment" >
+        <action
+            android:id="@+id/action_homeFragment_to_cropFragment"
+            app:destination="@id/cropFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_PDFViewFragment"
+            app:destination="@id/PDFViewFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/cropFragment"
+        android:name="com.wnet.imageconvertor.ui.cropscreen.CropFragment"
+        android:label="crop_fragment"
+        tools:layout="@layout/crop_fragment" >
+        <action
+            android:id="@+id/action_cropFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/PDFViewFragment"
+        android:name="com.wnet.imageconvertor.ui.pdfscreen.PDFViewFragment"
+        android:label="pdfview_fragment"
+        tools:layout="@layout/pdfview_fragment" />
+</navigation>

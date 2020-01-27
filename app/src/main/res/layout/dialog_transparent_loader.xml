@@ -5,11 +5,6 @@
     android:layout_gravity="center"
     android:background="@color/transparent">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/transparent"/>
-
     <ProgressBar
         android:layout_width="@dimen/_60sdp"
         android:layout_height="@dimen/_60sdp"
